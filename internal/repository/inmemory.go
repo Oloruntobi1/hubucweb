@@ -1,13 +1,15 @@
 package repository
 
 import (
+	"sync"
+
 	"github.com/Oloruntobi1/hubucweb/internal/models"
 	"github.com/google/uuid"
 )
 
 type InMemory struct {
 	//lock
-
+	sync.Mutex
 	UserMap map[uuid.UUID]*models.User
 }
 
@@ -29,14 +31,17 @@ func (i *InMemory) GetUser(id uuid.UUID) (*models.User, error) {
 }
 
 func (i *InMemory) CreateUser(uuid uuid.UUID, user *models.User) (*models.User, error) {
+	i.Lock()
 	v, ok := i.UserMap[uuid]
+	i.Unlock()
 	// check email already exists
 	if ok && v.Email == user.Email {
 		return nil, ErrUserAlreadyEXists
 	}
-	// lock here
+
+	i.Lock()
 	i.UserMap[uuid] = user
-	// unlock
+	i.Unlock()
 
 	return user, nil
 
