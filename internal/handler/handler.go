@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/Oloruntobi1/hubucweb/internal/middleware"
 	repo "github.com/Oloruntobi1/hubucweb/internal/repository"
 	"github.com/gin-gonic/gin"
 )
@@ -10,7 +11,7 @@ type Server struct {
 	router *gin.Engine
 }
 
-func NewServer(store repo.Repository)( *Server, error) {
+func NewServer(store repo.Repository) (*Server, error) {
 	s := &Server{
 		store: store,
 	}
@@ -22,7 +23,8 @@ func NewServer(store repo.Repository)( *Server, error) {
 func (s *Server) setupRouter() {
 	r := gin.Default()
 
-	r.POST("/api/v1/user", s.CreateUser)
+	r.Use(middleware.LoggerToFile())
+	r.POST("/user", s.CreateUser)
 	s.router = r
 }
 
@@ -41,4 +43,12 @@ type GoodResponse struct {
 type BadResponse struct {
 	Message string
 	Err     error
+}
+
+func errorResponse(err error) gin.H {
+	return gin.H{
+		"success": false,
+		"message": "",
+		"error":   err.Error(),
+	}
 }

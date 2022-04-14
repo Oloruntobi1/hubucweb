@@ -8,7 +8,8 @@ import (
 )
 
 var (
-	ErrUserNotFound = fmt.Errorf("user not found")
+	ErrUserNotFound      = fmt.Errorf("user not found")
+	ErrUserAlreadyEXists = fmt.Errorf("user already exists")
 )
 
 type Reader interface {
@@ -16,7 +17,7 @@ type Reader interface {
 }
 
 type Creater interface {
-	CreateUser(uuid.UUID, *models.User) (uuid.UUID, error)
+	CreateUser(uuid.UUID, *models.User) (*models.User, error)
 }
 
 type Repository interface {
@@ -27,7 +28,7 @@ type Repository interface {
 func GetStorage(s string) Repository {
 	switch {
 	case s == "MYSQL":
-		// return MYSQL imple
+		// return MYSQL implementation
 	default:
 		inMemory := NewInMemory()
 		return inMemory

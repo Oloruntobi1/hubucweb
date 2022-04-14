@@ -8,6 +8,10 @@ import (
 	"github.com/Oloruntobi1/hubucweb/internal/repository"
 )
 
+func init() {
+	// wire up config using the util library
+}
+
 func main() {
 
 	// get current storage service from env variable

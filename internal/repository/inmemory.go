@@ -6,6 +6,8 @@ import (
 )
 
 type InMemory struct {
+	//lock
+
 	UserMap map[uuid.UUID]*models.User
 }
 
@@ -26,13 +28,16 @@ func (i *InMemory) GetUser(id uuid.UUID) (*models.User, error) {
 	return nil, ErrUserNotFound
 }
 
-func (i *InMemory) CreateUser(uuid uuid.UUID, user *models.User) (uuid.UUID, error) {
-	_, ok := i.UserMap[uuid]
-	if ok {
-		return uuid, nil
+func (i *InMemory) CreateUser(uuid uuid.UUID, user *models.User) (*models.User, error) {
+	v, ok := i.UserMap[uuid]
+	// check email already exists
+	if ok && v.Email == user.Email {
+		return nil, ErrUserAlreadyEXists
 	}
+	// lock here
 	i.UserMap[uuid] = user
+	// unlock
 
-	return uuid, nil
+	return user, nil
 
 }
